@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NotesApp - Modern Note Taking</title>
+    <meta name="description" content="A modern, responsive notes application with localStorage persistence">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+</head>
+<body>
+    <!-- Main App Container -->
+    <div class="app-container">
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">📝</span>
+                    <h1 class="logo-text">NotesApp</h1>
+                </div>
+                <button class="btn-icon btn-new-note" id="btnNewNote" title="New Note" aria-label="Create new note">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="sidebar-search">
+                <div class="search-wrapper">
+                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="searchInput" 
+                        placeholder="Search notes..." 
+                        autocomplete="off"
+                        aria-label="Search notes"
+                    >
+                </div>
+            </div>
+
+            <div class="sidebar-actions">
+                <button class="btn-secondary btn-filter" id="btnFilter" data-filter="all">
+                    <span>All Notes</span>
+                    <span class="note-count" id="noteCount">0</span>
+                </button>
+            </div>
+
+            <div class="notes-list" id="notesList">
+                <!-- Note cards will be dynamically inserted here -->
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn-icon" id="btnToggleTheme" title="Toggle Dark Mode" aria-label="Toggle dark mode">
+                    <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="btnExportNotes" title="Export Notes" aria-label="Export notes as JSON">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="btnImportNotes" title="Import Notes" aria-label="Import notes from JSON">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                </button>
+                <input type="file" id="importFileInput" accept=".json" style="display: none;" aria-hidden="true">
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="mainContent">
+            
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">📝</div>
+                <h2 class="empty-state-title">No Note Selected</h2>
+                <p class="empty-state-text">Create a new note or select an existing one to get started</p>
+                <button class="btn-primary" id="btnCreateFirstNote">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Create Your First Note
+                </button>
+            </div>
+
+            <!-- Note Editor -->
+            <div class="note-editor" id="noteEditor" style="display: none;">
+                <div class="note-editor-header">
+                    <div class="note-metadata">
+                        <span class="note-date" id="noteDate">Loading...</span>
+                        <span class="note-status" id="noteStatus">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Saved</span>
+                        </span>
+                    </div>
+                    <div class="note-actions">
+                        <button class="btn-icon" id="btnPinNote" title="Pin Note" aria-label="Pin this note">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 17v5"></path>
+                                <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"></path>
+                            </svg>
+                        </button>
+                        <button class="btn-icon" id="btnColorPicker" title="Change Color" aria-label="Change note color">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="13.5" cy="6.5" r=".5"></circle>
+                                <circle cx="17.5" cy="10.5" r=".5"></circle>
+                                <circle cx="8.5" cy="7.5" r=".5"></circle>
+                                <circle cx="6.5" cy="12.5" r=".5"></circle>
+                                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+                            </svg>
+                        </button>
+                        <button class="btn-icon btn-delete" id="btnDeleteNote" title="Delete Note" aria-label="Delete this note">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="color-picker-dropdown" id="colorPickerDropdown" style="display: none;">
+                    <div class="color-options">
+                        <button class="color-option" data-color="default" style="background: var(--note-bg-default);" aria-label="Default color"></button>
+                        <button class="color-option" data-color="blue" style="background: var(--note-bg-blue);" aria-label="Blue color"></button>
+                        <button class="color-option" data-color="green" style="background: var(--note-bg-green);" aria-label="Green color"></button>
+                        <button class="color-option" data-color="yellow" style="background: var(--note-bg-yellow);" aria-label="Yellow color"></button>
+                        <button class="color-option" data-color="red" style="background: var(--note-bg-red);" aria-label="Red color"></button>
+                        <button class="color-option" data-color="purple" style="background: var(--note-bg-purple);" aria-label="Purple color"></button>
+                    </div>
+                </div>
+
+                <div class="note-editor-body">
+                    <input 
+                        type="text" 
+                        class="note-title-input" 
+                        id="noteTitleInput" 
+                        placeholder="Untitled Note" 
+                        autocomplete="off"
+                        aria-label="Note title"
+                    >
+                    <textarea 
+                        class="note-content-input" 
+                        id="noteContentInput" 
+                        placeholder="Start typing your note..."
+                        aria-label="Note content"
+                    ></textarea>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Toggle Button -->
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle sidebar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" role="alert" aria-live="polite" aria-atomic="true">
+        <div class="toast-content">
+            <span class="toast-icon">✓</span>
+            <span class="toast-message" id="toastMessage">Action completed</span>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="modalOverlay" style="display: none;">
+        <div class="modal" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalDescription">
+            <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+            <p class="modal-description" id="modalDescription">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnModalCancel">Cancel</button>
+                <button class="btn-danger" id="btnModalConfirm">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="utils.js"></script>
+    <script src="storage.js"></script>
+    <script src="ui.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
